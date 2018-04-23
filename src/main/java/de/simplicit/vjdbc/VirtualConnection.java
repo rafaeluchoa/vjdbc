@@ -389,9 +389,13 @@ public class VirtualConnection extends VirtualBase implements Connection {
 	}
 
 	public boolean isValid(int timeout) throws SQLException {
-
-		if (timeout <= 0) {
+		
+		if(timeout == 0) {
+			return !_isClosed;
+			
+		} else if (timeout < 0) {
 			throw new SQLException("invalid timeout value " + timeout);
+			
 		}
 
 		// Schedule the keep alive timer task
