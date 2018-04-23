@@ -132,7 +132,7 @@ public class StreamingResultSet implements ResultSet, Externalizable {
 			Subject: use ResultSet.setFetchSize(_rowPacketSize) for performance reasons
 
 		 */
-		rs.setFetchSize(_rowPacketSize);
+		//rs.setFetchSize(_rowPacketSize);
 
 		// Create first ResultSet-Part
 		_rows = new RowPacket(_rowPacketSize, _forwardOnly);
@@ -187,7 +187,7 @@ public class StreamingResultSet implements ResultSet, Externalizable {
 			}
 			_remainingResultSet = null;
 		}
-		if (((VirtualStatement)_statement).isCloseOnCompletion()) {
+		if (_statement != null && ((VirtualStatement)_statement).isCloseOnCompletion()) {
 			_statement.close();
 		}
 	}

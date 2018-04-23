@@ -8,20 +8,6 @@
   <name>VJDBC JDBC driver</name>
   <url>http://gioorgi.com/tag/vjdbc</url>
 
-  <repositories>
-    <repository>
-      <id>Maven Central repository</id>
-      <url>http://repo.maven.apache.org/maven2/</url>
-    </repository>
-    <!-- Required until the Servlet 3.0 API can be resolved 
-        in Central -->     
-    <repository>
-      <id>Glassfish</id>
-      <name>Glassfish Maven2 Repository</name>
-      <url>http://download.java.net/maven/glassfish/</url>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
       <plugin>
@@ -45,24 +31,6 @@
       </plugin>
 
 
-<!--  GG Not needed anymore:
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rmic-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <executions>
-          <execution>
-            <id>rmi compilation</id>
-            <goals>
-              <goal>rmic</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
- -->      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -203,18 +171,6 @@
     </developer>         
   </developers>
 
-<!--
-  <mailingLists>
-    <mailingList>
-      <name>vJDBC project mailing list</name>
-      <subscribe></subscribe>
-      <unsubscribe></unsubscribe>
-      <post></post>
-      <archive></archive>
-    </mailingList>
-  </mailingLists>
--->
-
   <scm>
     <connection>scm:svn:https://vjdbc.svn.sourceforge.net/svnroot/vjdbc/</connection>
     <developerConnection>scm:svn:https://vjdbc.svn.sourceforge.net/svnroot/vjdbc/</developerConnection>
@@ -331,6 +287,12 @@
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.1</version>
+      <exclusions>
+      	<exclusion>
+      		<groupId>javax.servlet</groupId>
+      		<artifactId>servlet-api</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
 
 
@@ -364,12 +326,14 @@
       <groupId>org.glassfish</groupId>
       <artifactId>javax.servlet</artifactId>
       <version>3.0</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
         <groupId>javax</groupId>
         <artifactId>javaee-api</artifactId>
         <version>6.0</version>
+        <scope>provided</scope>
     </dependency>
 
 <!--  GG Added this dependency for internal caching and housekeeping even if it is not a good option -->
