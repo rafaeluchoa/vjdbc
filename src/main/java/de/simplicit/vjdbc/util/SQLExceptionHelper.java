@@ -21,7 +21,7 @@ public class SQLExceptionHelper {
 			if (t instanceof SQLException) {
 				return (SQLException)t;
 			}
-			return new SQLException(t.getMessage(), t);
+			return new SQLException(t != null ? t.getMessage() : "Error", t);
 		}
 
 		return wrapThrowable(t);
