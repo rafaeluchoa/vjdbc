@@ -4,21 +4,6 @@
 
 package de.simplicit.vjdbc.server.config;
 
-import de.simplicit.vjdbc.VJdbcException;
-import de.simplicit.vjdbc.VJdbcProperties;
-import de.simplicit.vjdbc.server.DataSourceProvider;
-import de.simplicit.vjdbc.server.LoginHandler;
-
-
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDriver;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -29,6 +14,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.zip.Deflater;
 
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDriver;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool.impl.GenericObjectPool;
+
+import de.simplicit.vjdbc.VJdbcException;
+import de.simplicit.vjdbc.VJdbcProperties;
+import de.simplicit.vjdbc.server.DataSourceProvider;
+import de.simplicit.vjdbc.server.LoginHandler;
+
 public class ConnectionConfiguration implements Executor {
 	private static Log _logger = LogFactory.getLog(ConnectionConfiguration.class);
 	private static final String DBCP_ID = "jdbc:apache:commons:dbcp:";
@@ -37,7 +37,7 @@ public class ConnectionConfiguration implements Executor {
 	protected String _id;
 	protected String _driver;
 	protected String _url;
-	protected String _dataSourceProvider;
+	protected DataSourceProvider _dataSourceProvider;
 	protected String _user;
 	protected String _password;
 	// Trace properties
@@ -99,11 +99,11 @@ public class ConnectionConfiguration implements Executor {
 		_url = url;
 	}
 
-	public String getDataSourceProvider() {
+	public DataSourceProvider getDataSourceProvider() {
 		return _dataSourceProvider;
 	}
 
-	public void setDataSourceProvider(String dataSourceProvider) {
+	public void setDataSourceProvider(DataSourceProvider dataSourceProvider) {
 		_dataSourceProvider = dataSourceProvider;
 	}
 
@@ -338,10 +338,7 @@ public class ConnectionConfiguration implements Executor {
 		_logger.debug("Creating DataSourceFactory from class " + _dataSourceProvider);
 
 		try {
-			Class clsDataSourceProvider = Class.forName(_dataSourceProvider);
-			DataSourceProvider dataSourceProvider = (DataSourceProvider) clsDataSourceProvider.newInstance();
-			_logger.debug("DataSourceProvider created");
-			DataSource dataSource = dataSourceProvider.getDataSource();
+			DataSource dataSource = _dataSourceProvider.getDataSource();
 			_logger.debug("Retrieving connection from DataSource");
 			if(_user != null) {
 				result = dataSource.getConnection(_user, _password);
@@ -349,18 +346,10 @@ public class ConnectionConfiguration implements Executor {
 				result = dataSource.getConnection();
 			}
 			_logger.debug("... Connection successfully retrieved");
-		} catch (ClassNotFoundException e) {
-			String msg = "DataSourceProvider-Class " + _dataSourceProvider + " not found";
+		} catch (Exception e) {
+			String msg = "Can't create DataSource";
 			_logger.error(msg, e);
-			throw new SQLException(msg);
-		} catch (InstantiationException e) {
-			String msg = "Failed to create DataSourceProvider";
-			_logger.error(msg, e);
-			throw new SQLException(msg);
-		} catch (IllegalAccessException e) {
-			String msg = "Can't access DataSourceProvider";
-			_logger.error(msg, e);
-			throw new SQLException(msg);
+			throw new SQLException(msg, e);
 		}
 
 		return result;
